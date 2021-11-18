@@ -1,0 +1,28 @@
+RUN: llvm-bolt %p/Inputs/milc_spec06 -o %t -relocs -dyno-stats \
+RUN:   -data=%p/Inputs/milc_spec06.fdata -reorder-blocks=cache \
+RUN:   -split-functions=3 -reorder-functions=hfsort+ \
+RUN:   |& FileCheck %s
+
+CHECK: BOLT-INFO: Target architecture: aarch64
+CHECK: BOLT-INFO: operating with basic samples
+CHECK: BOLT-INFO: 64 out of 253 functions in the binary (25.3%) have non-empty execution profile
+CHECK: BOLT-INFO: UCE removed 0 blocks and 0 bytes of code.
+
+CHECK:               187203 : executed forward branches (-7.2%)
+CHECK:                13173 : taken forward branches (-98.0%)
+CHECK:              3009814 : executed backward branches (+0.5%)
+CHECK:              2893689 : taken backward branches (-0.0%)
+CHECK:                 8219 : executed unconditional branches (-8.5%)
+CHECK:              2442037 : all function calls (=)
+CHECK:                  511 : indirect calls (=)
+CHECK:                    0 : PLT calls (=)
+CHECK:            331438582 : executed instructions (+0.0%)
+CHECK:             12458672 : executed load instructions (=)
+CHECK:                    0 : executed store instructions (=)
+CHECK:                    0 : taken jump table branches (=)
+CHECK:                    0 : taken unknown indirect branches (=)
+CHECK:              3205236 : total branches (-0.0%)
+CHECK:              2915081 : taken branches (-18.4%)
+CHECK:               290155 : non-taken conditional branches (-100.0%)
+CHECK:              2906862 : taken conditional branches (-18.4%)
+CHECK:              3197017 : all conditional branches (=)

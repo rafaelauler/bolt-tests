@@ -1,0 +1,29 @@
+RUN: llvm-bolt %p/Inputs/perlbench_spec17 -o %t -relocs -dyno-stats \
+RUN:   -data=%p/Inputs/perlbench_spec17.fdata -reorder-blocks=cache \
+RUN:   -split-functions=3 -reorder-functions=hfsort+ \
+RUN:   |& FileCheck %s
+
+CHECK: BOLT-INFO: Target architecture: aarch64
+CHECK: BOLT-INFO: operating with basic samples
+CHECK: BOLT-INFO: 445 out of 2422 functions in the binary (18.4%) have non-empty execution profile
+CHECK: BOLT-INFO: UCE removed 0 blocks and 0 bytes of code.
+
+CHECK:              7524891 : executed forward branches (+22.1%)
+CHECK:               614180 : taken forward branches (-81.6%)
+CHECK:              2130515 : executed backward branches (-39.0%)
+CHECK:              1556238 : taken backward branches (-30.1%)
+CHECK:               354329 : executed unconditional branches (-51.6%)
+CHECK:              1883107 : all function calls (=)
+CHECK:              1127667 : indirect calls (=)
+CHECK:                    0 : PLT calls (=)
+CHECK:             65123896 : executed instructions (-0.7%)
+CHECK:             17103495 : executed load instructions (=)
+CHECK:                    0 : executed store instructions (=)
+CHECK:                    0 : taken jump table branches (=)
+CHECK:                    0 : taken unknown indirect branches (=)
+CHECK:             10009735 : total branches (-3.6%)
+CHECK:              2524747 : taken branches (-59.9%)
+CHECK:              7484988 : non-taken conditional branches (+82.9%)
+CHECK:              2170418 : taken conditional branches (-61.0%)
+CHECK:              9655406 : all conditional branches (=)
+
