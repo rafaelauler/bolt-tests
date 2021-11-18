@@ -16,7 +16,7 @@ $ cmake -G Ninja ../llvm-bolt/llvm \
    -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
    -DLLVM_ENABLE_PROJECTS="clang;lld;bolt" \
    -DLLVM_EXTERNAL_PROJECTS="bolttests" \
-   -DLLVM_EXTERNAL_BOLTTESTS_SOURCE_DIR=$(pwd)/../llvm/bolt-tests
+   -DLLVM_EXTERNAL_BOLTTESTS_SOURCE_DIR=$(pwd)/../bolt-tests
 $ ninja check-large-bolt
 ```
 
