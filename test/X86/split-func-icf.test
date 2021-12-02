@@ -1,0 +1,10 @@
+# Check that BOLT is able to process the binary with split functions and ICF'd fragment
+
+# Ensure that fragment is ICF'ed
+RUN: llvm-nm %p/Inputs/merge-fdata | grep \.cold | \
+RUN:   FileCheck %s --check-prefix CHECK-NM
+CHECK-NM:      [[#%x,ADDR:]] t je_malloc_mutex_postfork_child.cold
+CHECK-NM-NEXT: [[#ADDR]]     t je_malloc_vsnprintf.cold
+
+# Ensure that BOLT doesn't crash processing the binary
+RUN: llvm-bolt %p/Inputs/merge-fdata -o /dev/null
