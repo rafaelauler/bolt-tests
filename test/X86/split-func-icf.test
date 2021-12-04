@@ -7,4 +7,38 @@ CHECK-NM:      [[#%x,ADDR:]] t je_malloc_mutex_postfork_child.cold
 CHECK-NM-NEXT: [[#ADDR]]     t je_malloc_vsnprintf.cold
 
 # Ensure that BOLT doesn't crash processing the binary
-RUN: llvm-bolt %p/Inputs/merge-fdata -o /dev/null
+RUN: llvm-bolt %p/Inputs/merge-fdata -o /dev/null -v=1 |& FileCheck %s --check-prefix CHECK-NOSKIP
+CHECK-NOSKIP: BOLT-WARNING: Ignoring je_malloc_vsnprintf/1
+CHECK-NOSKIP: BOLT-WARNING: Ignoring je_malloc_vsnprintf.cold/1(*4)
+CHECK-NOSKIP: BOLT-WARNING: Ignoring je_malloc_mutex_postfork_child/1
+
+# Ensure that the fragment is ignored if either parent is skipped manually
+RUN: llvm-bolt %p/Inputs/merge-fdata -o /dev/null \
+RUN:   -skip-funcs=je_malloc_vsnprintf -v=1 |& \
+RUN: FileCheck %s --check-prefix CHECK-SKIP-PARENT1
+CHECK-SKIP-PARENT1: BOLT-WARNING: Ignoring je_malloc_vsnprintf.cold/1(*4)
+CHECK-SKIP-PARENT1: BOLT-WARNING: Ignoring je_malloc_mutex_postfork_child/1
+
+RUN: llvm-bolt %p/Inputs/merge-fdata -o /dev/null \
+RUN:   -skip-funcs=je_malloc_mutex_postfork_child -v=1 |& \
+RUN: FileCheck %s --check-prefix CHECK-SKIP-PARENT2
+CHECK-SKIP-PARENT2: BOLT-WARNING: Ignoring je_malloc_vsnprintf/1
+CHECK-SKIP-PARENT2: BOLT-WARNING: Ignoring je_malloc_vsnprintf.cold/1(*4)
+
+RUN: llvm-bolt %p/Inputs/merge-fdata -o /dev/null \
+RUN:   -skip-funcs=je_malloc_vsnprintf,je_malloc_mutex_postfork_child -v=1 |& \
+RUN: FileCheck %s --check-prefix CHECK-SKIP-BOTH-PARENTS
+CHECK-SKIP-BOTH-PARENTS: BOLT-WARNING: Ignoring je_malloc_vsnprintf.cold/1(*4)
+# Ensure that the parents are ignored if the fragment is skipped manually by
+# either name
+RUN: llvm-bolt %p/Inputs/merge-fdata -o /dev/null \
+RUN:   -skip-funcs=je_malloc_vsnprintf.cold -v=1 |& \
+RUN: FileCheck %s --check-prefix CHECK-SKIP-FRAGMENT-NAME1
+CHECK-SKIP-FRAGMENT-NAME1: BOLT-WARNING: Ignoring je_malloc_vsnprintf/1
+CHECK-SKIP-FRAGMENT-NAME1: BOLT-WARNING: Ignoring je_malloc_mutex_postfork_child/1
+
+RUN: llvm-bolt %p/Inputs/merge-fdata -o /dev/null \
+RUN:   -skip-funcs=je_malloc_mutex_postfork_child.cold -v=1 |& \
+RUN: FileCheck %s --check-prefix CHECK-SKIP-FRAGMENT-NAME2
+CHECK-SKIP-FRAGMENT-NAME2: BOLT-WARNING: Ignoring je_malloc_vsnprintf/1
+CHECK-SKIP-FRAGMENT-NAME2: BOLT-WARNING: Ignoring je_malloc_mutex_postfork_child/1
