@@ -1,0 +1,9 @@
+# Check that we can split a function with exception ranges and then strip the binary.
+
+REQUIRES: x86_64-linux
+
+RUN: llvm-bolt %p/Inputs/exception4 -use-gnu-stack -data=%p/Inputs/exception4.fdata -split-functions=1 -reorder-blocks=cache -align-blocks=1 -preserve-blocks-alignment=1 -o %t && llvm-strip %t && %t |& FileCheck %s
+
+CHECK:      catch 2
+CHECK:      catch 1
+CHECK:      caught ExcC
