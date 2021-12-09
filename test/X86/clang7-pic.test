@@ -1,0 +1,29 @@
+# Check that llvm-bolt processes PIC clang binary and the resulting binary
+# correctly compiles a C++ source.
+
+REQUIRES: x86_64-linux
+
+RUN: mkdir -p %p/Output
+RUN: test -f %p/Output/clang-7.pic || \
+RUN:    unzstd %p/Inputs/clang-7.pic.zst -o %p/Output/clang-7.pic
+RUN: test -f %p/Output/clang-7.pic.fdata || \
+RUN:    unzstd %p/Inputs/clang-7.pic.fdata.zst -o %p/Output/clang-7.pic.fdata
+RUN: llvm-bolt %p/Output/clang-7.pic -o %t -data %p/Output/clang-7.pic.fdata \
+RUN:    -relocs -reorder-blocks=cache+ -split-functions=3 -split-all-cold \
+RUN:    -split-eh -icf=1 -reorder-functions=hfsort+ -use-gnu-stack \
+RUN:    -jump-tables=aggressive -frame-opt=hot -strict \
+RUN:    | FileCheck %s --check-prefix=CHECK-STRICT
+RUN: %t %p/Inputs/clang-7.pic.input.cpp -O2 -c -o %t.out
+RUN: cmp %p/Inputs/clang-7.pic.input.o %t.out
+
+CHECK-STRICT: BOLT-INFO: 14724 out of 59493 functions in the binary (24.7%) have non-empty execution profile
+
+# Non-relocation mode test.
+RUN: llvm-bolt %p/Output/clang-7.pic -o %t -data %p/Output/clang-7.pic.fdata \
+RUN:    -relocs=0 -reorder-blocks=cache+ -split-functions=1 \
+RUN:    -use-gnu-stack -jump-tables=aggressive -frame-opt=hot \
+RUN:    | FileCheck %s
+RUN: %t %p/Inputs/clang-7.pic.input.cpp -O2 -c -o %t.out
+RUN: cmp %p/Inputs/clang-7.pic.input.o %t.out
+
+CHECK: BOLT-INFO: 14557 out of 59493 functions in the binary (24.5%) have non-empty execution profile
