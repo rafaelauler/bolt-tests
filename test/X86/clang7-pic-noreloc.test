@@ -1,0 +1,13 @@
+# Check that llvm-bolt processes PIC clang binary and the resulting binary
+# correctly compiles a C++ source. Non-relocation mode test.
+
+REQUIRES: x86_64-linux
+
+RUN: llvm-bolt %p/Inputs/clang-7.pic -o %t -data %p/Inputs/clang-7.pic.fdata \
+RUN:    -relocs=0 -reorder-blocks=cache+ -split-functions=1 \
+RUN:    -use-gnu-stack -jump-tables=aggressive -frame-opt=hot \
+RUN:    >& %t.log && \
+RUN: %t %p/Inputs/clang-7.pic.input.cpp -O2 -c -o %t.out && \
+RUN: cmp %p/Inputs/clang-7.pic.input.o %t.out && FileCheck %s -input-file %t.log
+
+CHECK: BOLT-INFO: 14557 out of 59493 functions in the binary (24.5%) have non-empty execution profile
