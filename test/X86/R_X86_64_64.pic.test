@@ -1,0 +1,6 @@
+# Check that we accept R_X86_64_64 relocation in a PIC binary, which is encoded
+# as the addend in a R_X86_64_RELATIVE dynamic relocation. This test just checks
+# that we do not assert in case the contents of the relocated data object do not
+# match the static relocation result.
+
+RUN: llvm-bolt %p/Inputs/R_X86_64_64.so -o %t -relocs

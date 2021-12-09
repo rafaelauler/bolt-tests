@@ -1,1 +1,2 @@
+test/*/Inputs/* filter=lfs diff=lfs merge=lfs -text
 test/*/Inputs/* !text !filter !merge !diff
