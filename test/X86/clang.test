@@ -1,0 +1,15 @@
+# Check that llvm-bolt processes clang binary and the resulting binary
+# correctly compiles a C++ source.
+
+REQUIRES: x86_64-linux
+
+RUN: llvm-bolt %p/Inputs/clang -o %t -b %p/Inputs/clang.fdata -profile-ignore-hash \
+RUN:    -relocs -reorder-blocks=cache+ -split-functions=3 -split-all-cold \
+RUN:    -split-eh -icf=1 -reorder-functions=hfsort+ -use-gnu-stack \
+RUN:    -jump-tables=move -frame-opt=hot -peepholes=all \
+RUN:    >& %t.log && \
+RUN: %t %p/Inputs/bf.cpp -O2 -std=c++11 -c -o %t.out && \
+RUN: cmp %p/Inputs/bf.o %t.out && FileCheck %s -input-file %t.log
+
+CHECK: BOLT-INFO: 11157 out of 73940 functions in the binary (15.1%) have non-empty execution profile
+CHECK-NEXT: BOLT-INFO: 15 functions with profile could not be optimized
