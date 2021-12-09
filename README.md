@@ -4,6 +4,11 @@ This is a testsuite containing large binaries for [BOLT](https://github.com/face
 
 ## Usage
 
+Install binary tests prerequisites (libtinfo.so.5):
+```
+sudo apt-get install libtinfo5
+```
+
 Configure LLVM with the `LLVM_EXTERNAL_PROJECTS` and
 `LLVM_EXTERNAL_PROJECTS_SOURCE_DIR` cmake flags. Example:
 
