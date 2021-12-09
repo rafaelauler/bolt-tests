@@ -1,0 +1,17 @@
+# Verify that C++ exceptions work after binary re-writing on PIE files
+
+REQUIRES: x86_64-linux
+
+RUN: llvm-bolt -relocs=0 -data %p/Inputs/exception.gcc5.pie.fdata \
+RUN:   -reorder-blocks=cache+ -split-functions=2 -split-all-cold -split-eh \
+RUN:   %p/Inputs/exception.gcc5.pie -o %t && %t 2>&1 | FileCheck %s
+RUN: llvm-bolt -relocs -data %p/Inputs/exception.gcc5.pie.fdata \
+RUN:   -reorder-blocks=cache+ -reorder-functions=hfsort -split-functions=2 \
+RUN:   -split-all-cold -split-eh \
+RUN:   %p/Inputs/exception.gcc5.pie -o %t && %t 2>&1 | FileCheck %s
+
+CHECK: catch 2
+CHECK-NEXT: catch 1
+CHECK-NEXT: caught ExcC
+
+
