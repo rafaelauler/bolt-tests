@@ -1,0 +1,14 @@
+# Reproduces issue https://github.com/facebookincubator/BOLT/issues/187
+# The issue was triggered by buildCFG->postProcessIndirectBranches->
+# addUnknownControlFlow invoked with a basic block that has multiple edges
+# to the same successor.
+
+# RUN: mkdir -p %p/Output
+# RUN: test -f %p/Output/libpython3.8-pyston2.3.so.1.0.perf || \
+# RUN:   unzstd %p/Inputs/libpython3.8-pyston2.3.so.1.0.perf.zst \
+# RUN:   -o %p/Output/libpython3.8-pyston2.3.so.1.0.perf
+# RUN: test -f %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt || \
+# RUN:   unzstd %p/Inputs/libpython3.8-pyston2.3.so.1.0.prebolt.zst \
+# RUN:   -o %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt
+# RUN: perf2bolt -p %p/Output/libpython3.8-pyston2.3.so.1.0.perf \
+# RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null
