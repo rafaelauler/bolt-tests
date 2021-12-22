@@ -2,6 +2,12 @@
 
 This is a testsuite containing large binaries for [BOLT](https://github.com/facebookincubator/BOLT).
 
+## Git LFS
+This repository uses [Git Large File Storage](https://github.com/git-lfs/git-lfs) to work around GitHub's file size limit which is 100Mb for plain Git repositories and 2GB with [LFS with GitHub Free](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-git-large-file-storage).
+
+Please follow the official instructions to install git-lfs:
+[Installation](https://github.com/git-lfs/git-lfs/wiki/Installation).
+
 ## Usage
 
 Install binary tests prerequisites (libtinfo.so.5):
