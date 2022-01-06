@@ -20,24 +20,5 @@ RUN: FileCheck %s -check-prefix=CHECKREORDER --input-file=%t.log
 CHECKREORDER: BOLT-INFO: Target architecture: aarch64
 CHECKREORDER: BOLT-INFO: 18 out of 78 functions in the binary (23.1%) have non-empty execution profile
 
-CHECKREORDER:         13356393 : executed forward branches (+24.6%)
-CHECKREORDER:          1739529 : taken forward branches (-38.6%)
-CHECKREORDER:         10969151 : executed backward branches (-19.4%)
-CHECKREORDER:          5487367 : taken backward branches (-45.2%)
-CHECKREORDER:          1364840 : executed unconditional branches (+23.5%)
-CHECKREORDER:           217454 : all function calls (=)
-CHECKREORDER:                0 : indirect calls (=)
-CHECKREORDER:                0 : PLT calls (=)
-CHECKREORDER:        188999506 : executed instructions (+0.4%)
-CHECKREORDER:         52947399 : executed load instructions (=)
-CHECKREORDER:                0 : executed store instructions (=)
-CHECKREORDER:                0 : taken jump table branches (=)
-CHECKREORDER:                0 : taken unknown indirect branches (=)
-CHECKREORDER:         25690384 : total branches (+1.0%)
-CHECKREORDER:          8591736 : taken branches (-38.4%)
-CHECKREORDER:         17098648 : non-taken conditional branches (+48.9%)
-CHECKREORDER:          7226896 : taken conditional branches (-43.7%)
-CHECKREORDER:         24325544 : all conditional branches (=)
-
 CHECKREORDER: 18 out of 78 functions were overwritten.
 CHECKREORDER: rewritten functions cover 100.00% of the execution count of simple functions of this binary
