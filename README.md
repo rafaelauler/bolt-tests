@@ -9,12 +9,16 @@ Please follow the official instructions to install git-lfs:
 [Installation](https://github.com/git-lfs/git-lfs/wiki/Installation).
 
 ## Usage
-
-Install binary tests prerequisites (libtinfo.so.5):
+### Prerequisites
+- Install binary tests prerequisites (libtinfo.so.5):
 ```
 sudo apt-get install libtinfo5
 ```
-
+- Install perf tools:
+```
+sudo apt-get install linux-tools-`uname -r`
+```
+### LLVM CMake configuration
 Configure LLVM with the `LLVM_EXTERNAL_PROJECTS` and
 `LLVM_EXTERNAL_PROJECTS_SOURCE_DIR` cmake flags. Example:
 
