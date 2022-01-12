@@ -1,0 +1,34 @@
+# Check that the llvm-bolt update the dwarf information correctly in case:
+#  - DW_AT_low_pc is nullified in case the DW_AT_ranges tag already exists
+#  - DW_AT_high_pc is in the form of DW_FORM_addr
+
+RUN: llvm-bolt %p/Inputs/gcgort_aarch64 -o %t -update-debug-sections
+
+# Check the original binary values
+RUN: llvm-dwarfdump -debug-info %p/Inputs/gcgort_aarch64 |& \
+RUN:   FileCheck %s -check-prefix=CHECKORIG
+
+CHECKORIG:         DW_TAG_compile_unit
+CHECKORIG:             DW_AT_name        ("sync/atomic")
+CHECKORIG-NEXT:        DW_AT_language    (DW_LANG_Go)
+CHECKORIG-NEXT:        DW_AT_stmt_list   (0x00000000)
+CHECKORIG-NEXT:        DW_AT_low_pc      (0x000000000045f000)
+
+CHECKORIG:         DW_TAG_subprogram
+CHECKORIG:             DW_AT_name      ("sync/atomic.StoreUint32")
+CHECKORIG-NEXT:        DW_AT_low_pc    (0x000000000045f000)
+CHECKORIG-NEXT:        DW_AT_high_pc   (0x000000000045f010)
+
+# Check the bolted binary
+RUN: llvm-dwarfdump -debug-info %t |& FileCheck %s
+
+CHECK:    DW_TAG_compile_unit
+CHECK:        DW_AT_name        ("sync/atomic")
+CHECK-NEXT:   DW_AT_language    (DW_LANG_Go)
+CHECK-NEXT:   DW_AT_stmt_list   (0x00000000)
+CHECK-NEXT:   DW_AT_low_pc      (0x0000000000000000)
+
+CHECK:      DW_TAG_subprogram
+CHECK:          DW_AT_name      ("sync/atomic.StoreUint32")
+CHECK-NEXT:     DW_AT_low_pc    (0x000000000085d4cc)
+CHECK-NEXT:     DW_AT_high_pc   (0x000000000085d4d0)
