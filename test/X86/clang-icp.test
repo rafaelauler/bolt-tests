@@ -1,0 +1,61 @@
+# Check that llvm-bolt processes clang binary and the resulting binary
+# correctly compiles a C++ source.
+
+REQUIRES: x86_64-linux
+
+RUN: llvm-bolt %p/Inputs/clang -o %t -b %p/Inputs/clang.fdata \
+RUN:    -profile-ignore-hash -relocs -lite=0 \
+RUN:    -reorder-blocks=cache -split-functions=3 -indirect-call-promotion=all \
+RUN:    -indirect-call-promotion-topn=1 \
+RUN:    -icp-jt-remaining-percent-threshold=0 \
+RUN:    -icp-jt-total-percent-threshold=0 \
+RUN:    -icp-calls-remaining-percent-threshold=0 \
+RUN:    -icp-calls-total-percent-threshold=0 \
+RUN:    -icp-top-callsites=0 \
+RUN:    -eliminate-unreachable -peepholes=all \
+RUN:    -use-gnu-stack -dyno-stats -icp-jump-tables-targets \
+RUN:    |& FileCheck %s
+RUN: %t %p/Inputs/bf.cpp -O2 -std=c++11 -c -o %t.out
+RUN: cmp %p/Inputs/bf.o %t.out
+
+CHECK:      BOLT-INFO: 11157 out of 73940 functions in the binary (15.1%) have non-empty execution profile
+CHECK-NEXT: BOLT-INFO: 15 functions with profile could not be optimized
+CHECK-NEXT: BOLT-WARNING: 3948 (35.4% of all profiled) functions have invalid (possibly stale) profile. Use -report-stale to see the list.
+CHECK-NEXT: BOLT-INFO: profile for 2 objects was ignored
+
+CHECK:      BOLT-INFO: ICP total indirect callsites with profile = 1304
+CHECK-NEXT: BOLT-INFO: ICP total jump table callsites = 1237
+CHECK-NEXT: BOLT-INFO: ICP total number of calls = 1034600
+CHECK-NEXT: BOLT-INFO: ICP percentage of calls that are indirect = 11.6%
+CHECK-NEXT: BOLT-INFO: ICP percentage of indirect calls that can be optimized = 95.8%
+CHECK-NEXT: BOLT-INFO: ICP percentage of indirect callsites that are optimized = 100.0%
+CHECK-NEXT: BOLT-INFO: ICP number of method load elimination candidates = 0
+CHECK-NEXT: BOLT-INFO: ICP percentage of method calls candidates that have loads eliminated = 0.0%
+CHECK-NEXT: BOLT-INFO: ICP percentage of indirect branches that are optimized = 11.2%
+CHECK-NEXT: BOLT-INFO: ICP percentage of jump table callsites that are optimized = 5.3%
+CHECK-NEXT: BOLT-INFO: ICP number of jump table callsites that can use hot indices = 0
+CHECK-NEXT: BOLT-INFO: ICP percentage of jump table callsites that use hot indices = 0.0%
+
+CHECK:     3921223 : executed forward branches (-2.8%)
+CHECK:      271085 : taken forward branches (-64.4%)
+CHECK:      377564 : executed backward branches (+78.8%)
+CHECK:      174271 : taken backward branches (+47.0%)
+CHECK:      227626 : executed unconditional branches (-27.9%)
+CHECK:     1122267 : all function calls (=)
+CHECK:       89304 : indirect calls (-34.2%)
+CHECK:       87667 : PLT calls (=)
+CHECK:    39985108 : executed instructions (+0.0%)
+CHECK:    10058972 : executed load instructions (+0.0%)
+CHECK:     6828226 : executed store instructions (=)
+CHECK:       31842 : taken jump table branches (-11.2%)
+CHECK:           0 : taken unknown indirect branches (=)
+CHECK:     4526413 : total branches (-0.7%)
+CHECK:      672982 : taken branches (-43.7%)
+CHECK:     3853431 : non-taken conditional branches (+14.6%)
+CHECK:      445356 : taken conditional branches (-49.4%)
+CHECK:     4298787 : all conditional branches (+1.3%)
+
+CHECK:      BOLT-INFO: SCTC: patched 966 tail calls (952 forward) tail calls (14 backward) from a total of 966 while removing 20 double jumps and removing 886 basic blocks totalling 4430 bytes of code. CTCs total execution count is 65626 and the number of times CTCs are taken is 29810.
+CHECK:      BOLT-INFO: Peephole: 159 double jumps patched.
+CHECK-NEXT: BOLT-INFO: Peephole: 611 tail call traps inserted.
+CHECK-NEXT: BOLT-INFO: Peephole: 11 useless conditional branches removed.
