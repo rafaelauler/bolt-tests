@@ -47,18 +47,11 @@ tool_dirs = [config.llvm_tools_dir,
 
 tools = [
     ToolSubst('llvm-bolt', unresolved='fatal'),
-    ToolSubst('perf2bolt', unresolved='fatal'),
-    ToolSubst('yaml2obj', unresolved='fatal'),
-    ToolSubst('llvm-boltdiff', unresolved='fatal'),
     ToolSubst('llvm-dwarfdump', unresolved='fatal'),
-    ToolSubst('llvm-mc', unresolved='fatal'),
     ToolSubst('llvm-nm', unresolved='fatal'),
     ToolSubst('llvm-objdump', unresolved='fatal'),
-    ToolSubst('llvm-readelf', unresolved='fatal'),
-    ToolSubst('llvm-readobj', unresolved='fatal'),
     ToolSubst('llvm-strip', unresolved='fatal'),
-    ToolSubst('not', unresolved='fatal'),
-    ToolSubst('merge-fdata', unresolved='fatal'),
+    ToolSubst('perf2bolt', unresolved='fatal'),
 ]
 llvm_config.add_tool_substitutions(tools, tool_dirs)
 
@@ -67,7 +60,6 @@ llvm_config.with_system_environment(
     ['ASAN_SYMBOLIZER_PATH', 'MSAN_SYMBOLIZER_PATH'])
 
 config.substitutions.append(('%PATH%', config.environment['PATH']))
-config.substitutions.append(('%host_cc', config.host_cc))
 
 def calculate_arch_features(arch_string):
     features = []

@@ -9,24 +9,16 @@ set(BOLTTESTS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BOLTTESTS_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 set(BOLTTESTS_DEPS
-  clang
   count
   FileCheck
-  lld
   llvm-bolt
-  llvm-boltdiff
   llvm-config
   llvm-dwarfdump
-  llvm-mc
   llvm-nm
   llvm-objdump
-  llvm-readobj
-  llvm-readelf
   llvm-strip
-  merge-fdata
   not
   perf2bolt
-  yaml2obj
   )
 
 if (NOT DEFINED Python3_EXECUTABLE)
