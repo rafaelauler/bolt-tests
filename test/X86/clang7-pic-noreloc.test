@@ -3,6 +3,9 @@
 
 REQUIRES: x86_64-linux
 
+RUN: test -f %p/Inputs/clang-7.pic || unzstd %p/Inputs/clang-7.pic.zst
+RUN: test -f %p/Inputs/clang-7.pic.fdata || \
+RUN:    unzstd %p/Inputs/clang-7.pic.fdata.zst
 RUN: llvm-bolt %p/Inputs/clang-7.pic -o %t -data %p/Inputs/clang-7.pic.fdata \
 RUN:    -relocs=0 -reorder-blocks=cache+ -split-functions=1 \
 RUN:    -use-gnu-stack -jump-tables=aggressive -frame-opt=hot \
