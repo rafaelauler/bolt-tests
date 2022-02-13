@@ -10,9 +10,9 @@ Please follow the official instructions to install git-lfs:
 
 ## Usage
 ### Prerequisites
-- Install binary tests prerequisites (libtinfo.so.5):
+- Install binary tests prerequisites:
 ```
-sudo apt-get install libtinfo5
+sudo apt-get install libtinfo5 zstd
 ```
 - Install perf tools:
 ```
