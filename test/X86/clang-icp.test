@@ -3,6 +3,8 @@
 
 REQUIRES: x86_64-linux
 
+RUN: test -f %p/Inputs/clang || unzstd %p/Inputs/clang.zst
+RUN: test -f %p/Inputs/clang.fdata || unzstd %p/Inputs/clang.fdata.zst
 RUN: llvm-bolt %p/Inputs/clang -o %t -b %p/Inputs/clang.fdata \
 RUN:    -profile-ignore-hash -relocs -lite=0 \
 RUN:    -reorder-blocks=cache -split-functions=3 -indirect-call-promotion=all \
