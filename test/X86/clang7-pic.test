@@ -3,10 +3,12 @@
 
 REQUIRES: x86_64-linux
 
-RUN: test -f %p/Inputs/clang-7.pic || unzstd %p/Inputs/clang-7.pic.zst
-RUN: test -f %p/Inputs/clang-7.pic.fdata || \
-RUN:    unzstd %p/Inputs/clang-7.pic.fdata.zst
-RUN: llvm-bolt %p/Inputs/clang-7.pic -o %t -data %p/Inputs/clang-7.pic.fdata \
+RUN: mkdir -p %p/Output
+RUN: test -f %p/Output/clang-7.pic || \
+RUN:    unzstd %p/Inputs/clang-7.pic.zst -o %p/Output/clang-7.pic
+RUN: test -f %p/Output/clang-7.pic.fdata || \
+RUN:    unzstd %p/Inputs/clang-7.pic.fdata.zst -o %p/Output/clang-7.pic.fdata
+RUN: llvm-bolt %p/Output/clang-7.pic -o %t -data %p/Output/clang-7.pic.fdata \
 RUN:    -relocs -reorder-blocks=cache+ -split-functions=3 -split-all-cold \
 RUN:    -split-eh -icf=1 -reorder-functions=hfsort+ -use-gnu-stack \
 RUN:    -jump-tables=aggressive -frame-opt=hot -strict \
@@ -17,7 +19,7 @@ RUN: cmp %p/Inputs/clang-7.pic.input.o %t.out
 CHECK-STRICT: BOLT-INFO: 14724 out of 59493 functions in the binary (24.7%) have non-empty execution profile
 
 # Non-relocation mode test.
-RUN: llvm-bolt %p/Inputs/clang-7.pic -o %t -data %p/Inputs/clang-7.pic.fdata \
+RUN: llvm-bolt %p/Output/clang-7.pic -o %t -data %p/Output/clang-7.pic.fdata \
 RUN:    -relocs=0 -reorder-blocks=cache+ -split-functions=1 \
 RUN:    -use-gnu-stack -jump-tables=aggressive -frame-opt=hot \
 RUN:    | FileCheck %s
