@@ -5,7 +5,7 @@
 RUN: llvm-bolt %p/Inputs/bzip2 -o %t |& FileCheck %s
 
 CHECK: BOLT-INFO: Target architecture: aarch64
-CHECK: BOLT: 67 out of 78 functions were overwritten.
+CHECK: BOLT: 67 out of 102 functions were overwritten.
 
 # Check that llvm-bolt processes bzip2 binary for aarch64 in these conditions:
 #   - block reordering
@@ -18,7 +18,7 @@ RUN:   -split-functions=3 -profile-ignore-hash &> %t.log
 RUN: FileCheck %s -check-prefix=CHECKREORDER --input-file=%t.log
 
 CHECKREORDER: BOLT-INFO: Target architecture: aarch64
-CHECKREORDER: BOLT-INFO: 18 out of 78 functions in the binary (23.1%) have non-empty execution profile
+CHECKREORDER: BOLT-INFO: 18 out of 79 functions in the binary (22.8%) have non-empty execution profile
 
-CHECKREORDER: 18 out of 78 functions were overwritten.
+CHECKREORDER: 18 out of 102 functions were overwritten.
 CHECKREORDER: rewritten functions cover 100.00% of the execution count of simple functions of this binary
