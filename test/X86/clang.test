@@ -49,23 +49,23 @@ CHECK-NEXT: BOLT-INFO: ICP percentage of jump table callsites that are optimized
 CHECK-NEXT: BOLT-INFO: ICP number of jump table callsites that can use hot indices = 0
 CHECK-NEXT: BOLT-INFO: ICP percentage of jump table callsites that use hot indices = 0.0%
 
-CHECK:     3921223 : executed forward branches (-2.8%)
-CHECK:      271085 : taken forward branches (-64.4%)
-CHECK:      377564 : executed backward branches (+78.8%)
-CHECK:      174271 : taken backward branches (+47.0%)
-CHECK:      227626 : executed unconditional branches (-27.9%)
+CHECK:     3915616 : executed forward branches (-2.9%)
+CHECK:      269456 : taken forward branches (-64.6%)
+CHECK:      383171 : executed backward branches (+81.4%)
+CHECK:      178163 : taken backward branches (+50.3%)
+CHECK:      224905 : executed unconditional branches (-28.8%)
 CHECK:     1122267 : all function calls (=)
 CHECK:       89304 : indirect calls (-34.2%)
 CHECK:       87667 : PLT calls (=)
-CHECK:    39985108 : executed instructions (+0.0%)
+CHECK:    39982400 : executed instructions (+0.0%)
 CHECK:    10058972 : executed load instructions (+0.0%)
 CHECK:     6828226 : executed store instructions (=)
 CHECK:       31842 : taken jump table branches (-11.2%)
 CHECK:           0 : taken unknown indirect branches (=)
-CHECK:     4526413 : total branches (-0.7%)
-CHECK:      672982 : taken branches (-43.7%)
-CHECK:     3853431 : non-taken conditional branches (+14.6%)
-CHECK:      445356 : taken conditional branches (-49.4%)
+CHECK:     4523692 : total branches (-0.8%)
+CHECK:      672524 : taken branches (-43.8%)
+CHECK:     3851168 : non-taken conditional branches (+14.5%)
+CHECK:      447619 : taken conditional branches (-49.2%)
 CHECK:     4298787 : all conditional branches (+1.3%)
 
 CHECK:      BOLT-INFO: SCTC: patched 966 tail calls (952 forward) tail calls (14 backward) from a total of 966 while removing 20 double jumps and removing 886 basic blocks totalling 4430 bytes of code. CTCs total execution count is 65626 and the number of times CTCs are taken is 29810.
