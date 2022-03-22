@@ -5,7 +5,7 @@
 RUN: llvm-bolt %p/Inputs/bzip2 -o %t |& FileCheck %s
 
 CHECK: BOLT-INFO: Target architecture: aarch64
-CHECK: BOLT: 67 out of 102 functions were overwritten.
+CHECK: BOLT: 65 out of 102 functions were overwritten.
 
 # Check that llvm-bolt processes bzip2 binary for aarch64 in these conditions:
 #   - block reordering
