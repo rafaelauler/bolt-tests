@@ -9,7 +9,7 @@ RUN:    unzstd %p/Inputs/clang-7.pic.zst -o %p/Output/clang-7.pic
 RUN: test -f %p/Output/clang-7.pic.fdata || \
 RUN:    unzstd %p/Inputs/clang-7.pic.fdata.zst -o %p/Output/clang-7.pic.fdata
 RUN: llvm-bolt %p/Output/clang-7.pic -o %t -data %p/Output/clang-7.pic.fdata \
-RUN:    -relocs -reorder-blocks=cache+ -split-functions=3 -split-all-cold \
+RUN:    -relocs -reorder-blocks=ext-tsp -split-functions=3 -split-all-cold \
 RUN:    -split-eh -icf=1 -reorder-functions=hfsort+ -use-gnu-stack \
 RUN:    -jump-tables=aggressive -frame-opt=hot -strict \
 RUN:    | FileCheck %s --check-prefix=CHECK-STRICT
@@ -20,7 +20,7 @@ CHECK-STRICT: BOLT-INFO: 14724 out of 59493 functions in the binary (24.7%) have
 
 # Non-relocation mode test.
 RUN: llvm-bolt %p/Output/clang-7.pic -o %t -data %p/Output/clang-7.pic.fdata \
-RUN:    -relocs=0 -reorder-blocks=cache+ -split-functions=1 \
+RUN:    -relocs=0 -reorder-blocks=ext-tsp -split-functions=1 \
 RUN:    -use-gnu-stack -jump-tables=aggressive -frame-opt=hot \
 RUN:    | FileCheck %s
 RUN: %t %p/Inputs/clang-7.pic.input.cpp -O2 -c -o %t.out
