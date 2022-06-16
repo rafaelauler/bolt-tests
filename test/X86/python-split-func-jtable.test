@@ -1,0 +1,11 @@
+# Reproduces issue https://github.com/facebookincubator/BOLT/issues/245
+# The issue was triggered by getOrCreateJumpTable() when a jump table is
+# accessed from two fragments of same function.
+
+# RUN: mkdir -p %p/Output
+# RUN: test -f %p/Output/python || \
+# RUN:   unzstd %p/Inputs/python3.8.6.zst \
+# RUN:   -o %p/Output/python
+# RUN: llvm-bolt -v=3 -instrument %p/Output/python -o %p/Output/python.inst 2>&1 | FileCheck %s
+
+# CHECK: BOLT-WARNING: Multiple fragments access same jump table: sre_ucs4_match.cold/1(*2); sre_ucs4_match/1(*2)
