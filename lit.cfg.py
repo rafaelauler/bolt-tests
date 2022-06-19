@@ -51,6 +51,7 @@ tools = [
     ToolSubst('llvm-nm', unresolved='fatal'),
     ToolSubst('llvm-objdump', unresolved='fatal'),
     ToolSubst('llvm-strip', unresolved='fatal'),
+    ToolSubst('llvm-readelf', unresolved='fatal'),
     ToolSubst('perf2bolt', unresolved='fatal'),
 ]
 llvm_config.add_tool_substitutions(tools, tool_dirs)

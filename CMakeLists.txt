@@ -17,6 +17,7 @@ set(BOLTTESTS_DEPS
   llvm-nm
   llvm-objdump
   llvm-strip
+  llvm-readelf
   not
   perf2bolt
   )
