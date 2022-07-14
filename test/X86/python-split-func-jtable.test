@@ -8,4 +8,4 @@
 # RUN:   -o %p/Output/python
 # RUN: llvm-bolt -v=3 -instrument %p/Output/python -o %p/Output/python.inst 2>&1 | FileCheck %s
 
-# CHECK: BOLT-WARNING: Multiple fragments access same jump table: sre_ucs4_match.cold/1(*2); sre_ucs4_match/1(*2)
+# CHECK: BOLT-INFO: Multiple fragments access same jump table: sre_ucs4_match.cold/1(*2); sre_ucs4_match/1(*2)
