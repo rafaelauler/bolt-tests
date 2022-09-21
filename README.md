@@ -1,6 +1,7 @@
 # bolt-tests
 
-This is a testsuite containing large binaries for [BOLT](https://github.com/facebookincubator/BOLT).
+This is a testsuite containing large binaries for
+[BOLT](https://github.com/llvm/llvm-project/tree/main/bolt).
 
 ## Usage
 ### Prerequisites
@@ -17,16 +18,17 @@ Configure LLVM with the `LLVM_EXTERNAL_PROJECTS` and
 `LLVM_EXTERNAL_PROJECTS_SOURCE_DIR` cmake flags. Example:
 
 ```
-$ git clone https://github.com/facebookincubator/BOLT llvm-bolt
-$ git clone https://github.com/rafaelauler/bolt-tests bolt-tests
-$ mkdir build
-$ cd build
-$ cmake -G Ninja ../llvm-bolt/llvm \
+$ git clone https://github.com/llvm/llvm-project
+$ git clone https://github.com/rafaelauler/bolt-tests
+$ cmake -B bolt-build -G Ninja llvm-project/llvm \
+   -DCMAKE_BUILD_TYPE=Release \
    -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
    -DLLVM_ENABLE_PROJECTS="clang;lld;bolt" \
    -DLLVM_EXTERNAL_PROJECTS="bolttests" \
-   -DLLVM_EXTERNAL_BOLTTESTS_SOURCE_DIR=$(pwd)/../bolt-tests
-$ ninja check-large-bolt
+   -DLLVM_EXTERNAL_BOLTTESTS_SOURCE_DIR=$(pwd)/bolt-tests
+$ cmake --build bolt-build --target check-large-bolt
 ```
 
-When this repo is configured as an external project, it will add itself as an extra target in LLVM named "check-large-bolt". Just build that target to run this testsuite.
+When this repo is configured as an external project, it will add itself as an
+extra target in LLVM named "check-large-bolt". Just build that target to run
+this testsuite.
