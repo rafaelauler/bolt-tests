@@ -1,0 +1,26 @@
+# Check that BOLT can process bzip with no-lbr profile and the resulting binary
+# works correctly.
+REQUIRES: aarch64-linux
+
+# Collect the profile
+RUN: perf record -e cycles:u -o %t.data -- \
+RUN:   %p/Inputs/bzip2 %p/Inputs/bzip2.fdata
+
+# Convert the profile
+RUN: perf2bolt %p/Input/bzip2 -p %t.data -o %t.fdata -nl \
+RUN:   |& FileCheck %s -check-prefix=CHECK-P2B
+
+# Optimize using that profile
+RUN: llvm-bolt %p/Inputs/bzip2 -data %t.fdata -o %t |& FileCheck %s
+RUN:    -relocs -reorder-blocks=ext-tsp -split-functions=3 -split-all-cold \
+RUN:    -split-eh -icf=1 -reorder-functions=hfsort+ -use-gnu-stack \
+RUN:    -jump-tables=move -frame-opt=hot -peepholes=all -dyno-stats \
+RUN:   |& FileCheck %s -check-prefix=CHECK-BOLT
+
+# Check the resulting binary
+RUN: %t %p/Inputs/bzip2.fdata
+
+CHECK-P2B:      PERF2BOLT: processing basic events (without LBR)...
+CHECK-BOLT:     BOLT-INFO: pre-processing profile using branch profile reader
+CHECK-BOLT:     BOLT-INFO: operating with basic samples profiling data (no LBR).
+CHECK-BOLT-NOT: BOLT-INFO: 0 out of {{.*}} functions in the binary (0.0%) have non-empty execution profile
