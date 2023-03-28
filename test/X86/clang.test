@@ -34,7 +34,7 @@ RUN: cmp %p/Inputs/bf.o %t.out
 CHECK:      BOLT-INFO: 11157 out of 73940 functions in the binary (15.1%) have non-empty execution profile
 CHECK-NEXT: BOLT-INFO: 15 functions with profile could not be optimized
 CHECK-NEXT: BOLT-WARNING: 3948 (35.4% of all profiled) functions have invalid (possibly stale) profile. Use -report-stale to see the list.
-CHECK-NEXT: BOLT-INFO: profile for 2 objects was ignored
+CHECK:      BOLT-INFO: profile for 2 objects was ignored
 
 CHECK:      BOLT-INFO: ICP total indirect callsites with profile = 1304
 CHECK-NEXT: BOLT-INFO: ICP total jump table callsites = 1237
