@@ -3,12 +3,33 @@
 # addUnknownControlFlow invoked with a basic block that has multiple edges
 # to the same successor.
 
-# RUN: mkdir -p %p/Output
-# RUN: test -f %p/Output/libpython3.8-pyston2.3.so.1.0.perf || \
-# RUN:   unzstd %p/Inputs/libpython3.8-pyston2.3.so.1.0.perf.zst \
-# RUN:   -o %p/Output/libpython3.8-pyston2.3.so.1.0.perf
-# RUN: test -f %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt || \
-# RUN:   unzstd %p/Inputs/libpython3.8-pyston2.3.so.1.0.prebolt.zst \
-# RUN:   -o %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt
-# RUN: perf2bolt -p %p/Output/libpython3.8-pyston2.3.so.1.0.perf \
-# RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null
+RUN: mkdir -p %p/Output
+RUN: test -f %p/Output/libpython3.8-pyston2.3.so.1.0.perf || \
+RUN:   unzstd %p/Inputs/libpython3.8-pyston2.3.so.1.0.perf.zst \
+RUN:   -o %p/Output/libpython3.8-pyston2.3.so.1.0.perf
+RUN: test -f %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt || \
+RUN:   unzstd %p/Inputs/libpython3.8-pyston2.3.so.1.0.prebolt.zst \
+RUN:   -o %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt
+RUN: perf2bolt -p %p/Output/libpython3.8-pyston2.3.so.1.0.perf \
+RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o %t.fdata -w %t.yaml
+
+# Tests for fdata vs yaml from the same perf data
+RUN: llvm-bolt -p %p/Output/libpython3.8-pyston2.3.so.1.0.perf \
+RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
+RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1 --print-cfg \
+RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
+
+RUN: llvm-bolt -data %t.fdata \
+RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
+RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1 --print-cfg \
+RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
+
+RUN: llvm-bolt -data %t.yaml \
+RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
+RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1 --print-cfg \
+RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
+
+CHECK-FUNC: Binary Function "_PyEval_EvalCodeWithName.localalias/1(*2)" after building cfg
+CHECK-FUNC: Successors: .Ltmp[[#]] (mispreds: 0, count: 1), .LFT[[#FT:]] (mispreds: 0, count: 10578)
+CHECK-FUNC:      .LFT[[#FT]] (13 instructions, align : 1)
+CHECK-FUNC-NEXT: Exec Count : 10578
