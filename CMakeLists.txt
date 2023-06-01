@@ -19,7 +19,6 @@ set(BOLTTESTS_DEPS
   llvm-strip
   llvm-readelf
   not
-  perf2bolt
   )
 
 if (NOT DEFINED Python3_EXECUTABLE)
