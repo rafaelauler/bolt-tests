@@ -16,18 +16,21 @@ RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o %t.fdata -w %t.yaml
 # Tests for fdata vs yaml from the same perf data
 RUN: llvm-bolt -p %p/Output/libpython3.8-pyston2.3.so.1.0.perf \
 RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
-RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1 --print-cfg \
+RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1,dict_dealloc --print-cfg \
 RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
 
 RUN: llvm-bolt -data %t.fdata \
 RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
-RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1 --print-cfg \
+RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1,dict_dealloc --print-cfg \
 RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
 
 RUN: llvm-bolt -data %t.yaml \
 RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
-RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1 --print-cfg \
+RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1,dict_dealloc --print-cfg \
 RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
+
+CHECK-FUNC: Binary Function "dict_dealloc" after building cfg
+CHECK-FUNC: Exec Count  : 6371
 
 CHECK-FUNC: Binary Function "_PyEval_EvalCodeWithName.localalias/1(*2)" after building cfg
 CHECK-FUNC: Successors: .Ltmp[[#]] (mispreds: 0, count: 1), .LFT[[#FT:]] (mispreds: 0, count: 10578)
