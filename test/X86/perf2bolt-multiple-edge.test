@@ -15,21 +15,27 @@ RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o %t.fdata -w %t.yaml
 
 # Tests for fdata vs yaml from the same perf data
 RUN: llvm-bolt -p %p/Output/libpython3.8-pyston2.3.so.1.0.perf \
-RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
+RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o %t.bolt.perf \
 RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1,dict_dealloc --print-cfg \
 RUN:   --print-only=_PyEval_EvalFrame_AOT_Interpreter/1 \
+RUN:   -strict --bolt-info=0 \
+RUN:   --reorder-blocks=ext-tsp --reorder-functions=hfsort+ --split-functions \
 RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
 
 RUN: llvm-bolt -data %t.fdata \
-RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
+RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o %t.bolt.fdata \
 RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1,dict_dealloc --print-cfg \
 RUN:   --print-only=_PyEval_EvalFrame_AOT_Interpreter/1 \
+RUN:   -strict --bolt-info=0 \
+RUN:   --reorder-blocks=ext-tsp --reorder-functions=hfsort+ --split-functions \
 RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
 
 RUN: llvm-bolt -data %t.yaml \
-RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
+RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o %t.bolt.yaml \
 RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1,dict_dealloc --print-cfg \
 RUN:   --print-only=_PyEval_EvalFrame_AOT_Interpreter/1 \
+RUN:   -strict --bolt-info=0 \
+RUN:   --reorder-blocks=ext-tsp --reorder-functions=hfsort+ --split-functions \
 RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
 
 CHECK-FUNC: Binary Function "dict_dealloc" after building cfg
@@ -49,3 +55,6 @@ CHECK-FUNC: Successors: .Ltmp[[#]] (mispreds: 0, count: 1), .LFT[[#FT:]] (mispre
 CHECK-FUNC:      .LFT[[#FT]] (13 instructions, align : 1)
 CHECK-FUNC-NEXT: Exec Count : 10578
 CHECK-FUNC: End of Function "_PyEval_EvalCodeWithName.localalias/1(*2)"
+
+RUN: cmp %t.bolt.perf %t.bolt.yaml
+RUN: cmp %t.bolt.perf %t.bolt.fdata
