@@ -17,22 +17,35 @@ RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o %t.fdata -w %t.yaml
 RUN: llvm-bolt -p %p/Output/libpython3.8-pyston2.3.so.1.0.perf \
 RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
 RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1,dict_dealloc --print-cfg \
+RUN:   --print-only=_PyEval_EvalFrame_AOT_Interpreter/1 \
 RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
 
 RUN: llvm-bolt -data %t.fdata \
 RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
 RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1,dict_dealloc --print-cfg \
+RUN:   --print-only=_PyEval_EvalFrame_AOT_Interpreter/1 \
 RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
 
 RUN: llvm-bolt -data %t.yaml \
 RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o /dev/null \
 RUN:   --print-only=_PyEval_EvalCodeWithName.localalias/1,dict_dealloc --print-cfg \
+RUN:   --print-only=_PyEval_EvalFrame_AOT_Interpreter/1 \
 RUN:   | FileCheck %s --check-prefix=CHECK-FUNC
 
 CHECK-FUNC: Binary Function "dict_dealloc" after building cfg
 CHECK-FUNC: Exec Count  : 6371
+CHECK-FUNC: End of Function "dict_dealloc"
+
+CHECK-FUNC: Binary Function "_PyEval_EvalFrame_AOT_Interpreter/1" after building cfg
+CHECK-FUNC: IsSimple    : 1
+CHECK-FUNC: Profile Acc : 100.0%
+CHECK-FUNC: 00000184: leaq  "opcode_targets.16575/1"(%rip), %rdi
+CHECK-FUNC: 000001a0: movq  (%rdi,%rsi,8), %r9
+CHECK-FUNC: 000001a7: jmpq *%r9 # JUMPTABLE @0x65ab80 # JTIndexReg: 0
+CHECK-FUNC: End of Function "_PyEval_EvalFrame_AOT_Interpreter/1"
 
 CHECK-FUNC: Binary Function "_PyEval_EvalCodeWithName.localalias/1(*2)" after building cfg
 CHECK-FUNC: Successors: .Ltmp[[#]] (mispreds: 0, count: 1), .LFT[[#FT:]] (mispreds: 0, count: 10578)
 CHECK-FUNC:      .LFT[[#FT]] (13 instructions, align : 1)
 CHECK-FUNC-NEXT: Exec Count : 10578
+CHECK-FUNC: End of Function "_PyEval_EvalCodeWithName.localalias/1(*2)"
