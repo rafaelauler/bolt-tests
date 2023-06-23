@@ -68,7 +68,7 @@ CHECK:     3851168 : non-taken conditional branches (+14.5%)
 CHECK:      447619 : taken conditional branches (-49.2%)
 CHECK:     4298787 : all conditional branches (+1.3%)
 
-CHECK:      BOLT-INFO: SCTC: patched 966 tail calls (952 forward) tail calls (14 backward) from a total of 966 while removing 20 double jumps and removing 886 basic blocks totalling 4430 bytes of code. CTCs total execution count is 65626 and the number of times CTCs are taken is 29810.
+CHECK:      BOLT-INFO: SCTC: patched 966 tail calls (952 forward) tail calls (14 backward) from a total of 966 while removing 20 double jumps and removing 886 basic blocks totalling 4430 bytes of code. CTCs total execution count is 65626 and the number of times CTCs are taken is 29810
 CHECK:      BOLT-INFO: Peephole: 159 double jumps patched.
 CHECK-NEXT: BOLT-INFO: Peephole: 611 tail call traps inserted.
 CHECK-NEXT: BOLT-INFO: Peephole: 11 useless conditional branches removed.
