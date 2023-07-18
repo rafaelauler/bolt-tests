@@ -11,13 +11,13 @@ RUN:    unzstd %p/Inputs/clang.fdata.zst -o %p/Output/clang.fdata
 RUN: llvm-bolt %p/Output/clang -o %t -b %p/Output/clang.fdata -profile-ignore-hash \
 RUN:    -relocs -reorder-blocks=ext-tsp -split-functions=3 -split-all-cold \
 RUN:    -split-eh -icf=1 -reorder-functions=hfsort+ -use-gnu-stack \
-RUN:    -jump-tables=move -frame-opt=hot -peepholes=all
+RUN:    -jump-tables=move -frame-opt=hot -peepholes=all -profile-use-dfs
 RUN: %t %p/Inputs/bf.cpp -O2 -std=c++11 -c -o %t.out
 RUN: cmp %p/Inputs/bf.o %t.out
 
 # Test with ICP
 RUN: llvm-bolt %p/Output/clang -o %t -b %p/Output/clang.fdata \
-RUN:    -profile-ignore-hash -relocs -lite=0 \
+RUN:    -profile-ignore-hash -relocs -lite=0 -profile-use-dfs \
 RUN:    -reorder-blocks=cache -split-functions=3 -indirect-call-promotion=all \
 RUN:    -indirect-call-promotion-topn=1 \
 RUN:    -icp-jt-remaining-percent-threshold=0 \
