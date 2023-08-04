@@ -4,7 +4,7 @@
 
 # RUN: llvm-bolt %p/Inputs/debugTypesBug.exe --reorder-blocks=reverse \
 # RUN:   -update-debug-sections -o %t.out
-# RUN: llvm-dwarfdump --debug-info=0x00001c36 --debug-types=0x000005f7 %t.out |\
+# RUN: llvm-dwarfdump --debug-info=0x00001c2e --debug-types=0x000005f7 %t.out |\
 # RUN:   FileCheck %s --check-prefix=CHECK-OUTPUT
 
 # CHECK-OUTPUT: DW_AT_stmt_list	([[#%#.8x,OFFSET:]]
