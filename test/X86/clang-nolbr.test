@@ -1,7 +1,5 @@
 # Check that BOLT can process Clang with no-lbr profile and the resulting Clang
 # binary correctly compiles C++ source.
-# https://github.com/llvm/llvm-project/issues/71064
-XFAIL: *
 REQUIRES: x86_64-linux
 
 RUN: mkdir -p %p/Output
