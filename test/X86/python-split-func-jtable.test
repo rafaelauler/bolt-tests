@@ -6,12 +6,12 @@
 # RUN: test -f %p/Output/python || \
 # RUN:   unzstd %p/Inputs/python3.8.6.zst \
 # RUN:   -o %p/Output/python
-# RUN: llvm-bolt -v=3 -instrument %p/Output/python -o /dev/null 2>&1 | \
+# RUN: llvm-bolt -v=3 -instrument %p/Output/python -o %t.null 2>&1 | \
 # RUN:   FileCheck %s --check-prefix=CHECK-INST
 # CHECK-INST: BOLT-INFO: Multiple fragments access same jump table: sre_ucs4_match.cold/1(*2); sre_ucs4_match/1(*2)
 
 # Optimize in lite mode using pre-collected fdata profile
 #
 # RUN: llvm-bolt %p/Output/python -data %p/Inputs/python3.8.6.fdata -lite -v=1 \
-# RUN:   -o /dev/null 2>&1 | FileCheck %s --check-prefix=CHECK-OPT
+# RUN:   -o %t.null 2>&1 | FileCheck %s --check-prefix=CHECK-OPT
 # CHECK-OPT: BOLT-INFO: processing pymain_init.cold/1(*2) as a sibling of non-ignored function
