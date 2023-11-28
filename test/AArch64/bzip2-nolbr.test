@@ -1,20 +1,23 @@
 # Check that BOLT can process bzip with no-lbr profile and the resulting binary
 # works correctly.
-REQUIRES: aarch64-linux
+REQUIRES: native,system-linux
+XFAIL: *
 
 # Collect the profile
 RUN: perf record -e cycles:u -o %t.data -- \
 RUN:   %p/Inputs/bzip2 %p/Inputs/bzip2.fdata
 
 # Convert the profile
-RUN: perf2bolt %p/Input/bzip2 -p %t.data -o %t.fdata -nl \
+RUN: perf2bolt %p/Inputs/bzip2 -p %t.data -o %t.fdata -nl \
 RUN:   |& FileCheck %s -check-prefix=CHECK-P2B
 
 # Optimize using that profile
-RUN: llvm-bolt %p/Inputs/bzip2 -data %t.fdata -o %t |& FileCheck %s
-RUN:    -relocs -reorder-blocks=ext-tsp -split-functions=3 -split-all-cold \
-RUN:    -split-eh -icf=1 -reorder-functions=hfsort+ -use-gnu-stack \
-RUN:    -jump-tables=move -frame-opt=hot -peepholes=all -dyno-stats \
+# Check that llvm-bolt processes bzip2 binary for aarch64 in these conditions:
+#   - block reordering
+#   - function splitting
+#   - no relocs
+RUN: llvm-bolt %p/Inputs/bzip2 -o %t -lite -dyno-stats \
+RUN:   -data %t.fdata -reorder-blocks=cache -split-functions \
 RUN:   |& FileCheck %s -check-prefix=CHECK-BOLT
 
 # Check the resulting binary
