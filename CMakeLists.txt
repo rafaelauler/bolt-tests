@@ -11,6 +11,7 @@ set(BOLTTESTS_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(BOLTTESTS_DEPS
   count
   FileCheck
+  llvm-bat-dump
   llvm-bolt
   llvm-config
   llvm-dwarfdump

@@ -1,0 +1,76 @@
+# Check that BOLT can process openssl with BAT profile
+# Artifacts collected with:
+# - openssl-3.2.1 tag
+# - centos 9, gcc-toolset-13
+# - `./Configure -static -Wl,-q`
+# - profile `openssl speed` with ebpf-bolt for 100000 s
+
+REQUIRES: x86_64-linux
+
+RUN: mkdir -p %p/Output
+RUN: test -f %p/Output/openssl || unzstd %p/Inputs/openssl.zst -o %p/Output/openssl
+
+# Produce BAT
+RUN: llvm-bolt %p/Output/openssl -o %t.exe --pa -p %p/Inputs/openssl.preagg.txt \
+RUN:   -reorder-blocks=ext-tsp -peepholes=all -dyno-stats -enable-bat \
+RUN:   -split-functions -split-all-cold -split-eh -icf \
+RUN:   -reorder-functions=cdsort -use-gnu-stack -jump-tables=move -frame-opt=hot \
+RUN:   -print-cfg -print-only=bn_mul4x_mont.*,__memcpy_evex_unaligned_erms.* \
+RUN:   |& FileCheck %s -check-prefix=CHECK-BOLT-BAT
+
+# Check functions with multiple entries
+CHECK-BOLT-BAT: Binary Function "bn_mul4x_mont/1(*2)" after building cfg {
+CHECK-BOLT-BAT: IsMultiEntry: 1
+CHECK-BOLT-BAT: Hash        : 399e3bdc7e593d5c
+CHECK-BOLT-BAT: Secondary Entry Points : FUNCat0x53a966
+CHECK-BOLT-BAT: }
+CHECK-BOLT-BAT:   Secondary Entry Point: FUNCat0x53a966
+CHECK-BOLT-BAT-NEXT:   Exec Count : 211301
+CHECK-BOLT-BAT-NEXT:   CFI State : 1
+CHECK-BOLT-BAT-NEXT:   Input offset: 0x6
+
+CHECK-BOLT-BAT: Binary Function "__memcpy_evex_unaligned_erms(*2)" after building cfg {
+CHECK-BOLT-BAT-NEXT:  All names   : __memcpy_evex_unaligned_erms
+CHECK-BOLT-BAT-NEXT:                __memmove_evex_unaligned_erms
+CHECK-BOLT-BAT:  IsMultiEntry: 1
+CHECK-BOLT-BAT:  Hash        : cfce38fb253cf652
+CHECK-BOLT-BAT:  Secondary Entry Points :
+# BOLT keeps printing them in different order, so skipping the labels
+# COM: CHECK-BOLT-BAT-SAME: FUNCat0x881347
+# COM: CHECK-BOLT-BAT-SAME: __ENTRY___memcpy_evex_unaligned_erms@0x881380
+# COM: CHECK-BOLT-BAT-SAME: __ENTRY___memcpy_evex_unaligned_erms@0x88140d
+CHECK-BOLT-BAT: }
+CHECK-BOLT-BAT:   Secondary Entry Point: FUNCat0x881347
+CHECK-BOLT-BAT-NEXT:   Exec Count : 210224
+CHECK-BOLT-BAT-NEXT:   CFI State : 0
+CHECK-BOLT-BAT-NEXT:   Input offset: 0x7
+CHECK-BOLT-BAT:   Secondary Entry Point: __ENTRY___memcpy_evex_unaligned_erms@0x881380
+CHECK-BOLT-BAT-NEXT:   Exec Count : 118665
+CHECK-BOLT-BAT-NEXT:   CFI State : 0
+CHECK-BOLT-BAT-NEXT:   Input offset: 0x40
+CHECK-BOLT-BAT:   Secondary Entry Point: __ENTRY___memcpy_evex_unaligned_erms@0x88140d
+CHECK-BOLT-BAT-NEXT:   Exec Count : 13309
+CHECK-BOLT-BAT-NEXT:   CFI State : 0
+CHECK-BOLT-BAT-NEXT:   Input offset: 0xcd
+
+# Confirm addresses
+RUN: llvm-nm -n %t.exe | FileCheck %s -check-prefix=CHECK-NM
+CHECK-NM:      0000000000c01340 t bn_mul4x_mont
+CHECK-NM:      0000000000c09900 T __memcpy_evex_unaligned_erms
+CHECK-NM-NEXT: 0000000000c09900 T __memmove_evex_unaligned_erms
+
+# Verify that BAT contains multiple entry points
+RUN: llvm-bat-dump %t.exe --dump-all | FileCheck %s -check-prefix=CHECK-BAT-DUMP
+CHECK-BAT-DUMP:      Function Address: 0xc01340, hash: 0x64eb7c6c1513da6c
+CHECK-BAT-DUMP-NEXT: BB mappings:
+CHECK-BAT-DUMP-NEXT: 0x0 -> 0x0 hash: 0xe2009bcb77a90000
+CHECK-BAT-DUMP-NEXT: 0x3 -> 0x3 (branch)
+CHECK-BAT-DUMP-NEXT: 0x6 -> 0x6 hash: 0x32cdb7e92d280006
+CHECK-BAT-DUMP-NEXT: 1 secondary entry points:
+CHECK-BAT-DUMP-NEXT: 0x6
+
+CHECK-BAT-DUMP:      Function Address: 0xc09900, hash: 0xcfce38fb253cf652
+CHECK-BAT-DUMP:      3 secondary entry points:
+CHECK-BAT-DUMP-NEXT: 0x7
+CHECK-BAT-DUMP-NEXT: 0x40
+CHECK-BAT-DUMP-NEXT: 0xcd
