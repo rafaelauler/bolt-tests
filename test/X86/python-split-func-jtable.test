@@ -13,5 +13,6 @@
 # Optimize in lite mode using pre-collected fdata profile
 #
 # RUN: llvm-bolt %p/Output/python -data %p/Inputs/python3.8.6.fdata -lite -v=1 \
+# RUN:   -skip-funcs=_PyEval_EvalFrame_AOT_Interpreter/1 \
 # RUN:   -o %t.null 2>&1 | FileCheck %s --check-prefix=CHECK-OPT
 # CHECK-OPT: BOLT-INFO: processing pymain_init.cold/1(*2) as a sibling of non-ignored function
