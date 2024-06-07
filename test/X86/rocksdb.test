@@ -1,0 +1,10 @@
+## Reproduces emitLSDA quadratic behavior issue surfaced by
+## https://github.com/llvm/llvm-project/commit/b06e736982a3568fe2bcea8688550f9e393b7450
+## Before that commit, llvm-bolt finishes in 7.876s
+## With that commit, llvm-bolt runs longer than 2m
+
+# RUN: mkdir -p %p/Output
+# RUN: test -f %p/Output/librocksdb.so.9.4.0 || \
+# RUN:   unzstd %p/Inputs/librocksdb.so.9.4.0.zst \
+# RUN:   -o %p/Output/librocksdb.so.9.4.0
+# RUN: llvm-bolt %p/Output/librocksdb.so.9.4.0 -o %t.null
