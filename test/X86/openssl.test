@@ -5,7 +5,7 @@
 # - `./Configure -static -Wl,-q`
 # - profile `openssl speed` with ebpf-bolt for 100000 s
 
-REQUIRES: x86_64-linux
+REQUIRES: system-linux
 
 RUN: mkdir -p %p/Output
 RUN: test -f %p/Output/openssl || unzstd %p/Inputs/openssl.zst -o %p/Output/openssl
