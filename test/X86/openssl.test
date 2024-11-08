@@ -58,27 +58,28 @@ CHECK-BOLT-BAT-NEXT:   CFI State : 0
 CHECK-BOLT-BAT-NEXT:   Input offset: 0xcd
 
 # Confirm addresses
-RUN: llvm-nm -n %t.exe | FileCheck %s -check-prefix=CHECK-NM
-CHECK-NM:      0000000000c01340 t bn_mul4x_mont
-CHECK-NM:      0000000000c09900 T __memcpy_evex_unaligned_erms
-CHECK-NM-NEXT: 0000000000c09900 T __memmove_evex_unaligned_erms
-CHECK-NM:      0000000000c26200 T BN_BLINDING_convert_ex
+RUN: llvm-nm -n %t.exe > %t.log
+CHECK:      0000000000[[#%x,bn_mul4x_mont:]] t bn_mul4x_mont{{$}}
+CHECK:      0000000000[[#%x,memcpy:]] T __memcpy_evex_unaligned_erms
+CHECK-NEXT: 0000000000[[#%x,memcpy]] T __memmove_evex_unaligned_erms
+CHECK:      0000000000[[#%x,BN_BLINDING_convert_ex:]] T BN_BLINDING_convert_ex
 
 # Verify that BAT contains multiple entry points
-RUN: llvm-bat-dump %t.exe --dump-all | FileCheck %s -check-prefix=CHECK-BAT-DUMP
-CHECK-BAT-DUMP:      Function Address: 0xc01340, hash: 0x64eb7c6c1513da6c
-CHECK-BAT-DUMP-NEXT: BB mappings:
-CHECK-BAT-DUMP-NEXT: 0x0 -> 0x0 hash: 0xe2009bcb77a90000
-CHECK-BAT-DUMP-NEXT: 0x3 -> 0x3 (branch)
-CHECK-BAT-DUMP-NEXT: 0x6 -> 0x6 hash: 0x32cdb7e92d280006
-CHECK-BAT-DUMP:      1 secondary entry points:
-CHECK-BAT-DUMP-NEXT: 0x6
+RUN: llvm-bat-dump %t.exe --dump-all >> %t.log
+RUN: FileCheck %s -input-file %t.log
+CHECK:      Function Address: 0x[[#bn_mul4x_mont]], hash: 0x64eb7c6c1513da6c
+CHECK-NEXT: BB mappings:
+CHECK-NEXT: 0x0 -> 0x0 hash: 0xe2009bcb77a90000
+CHECK-NEXT: 0x3 -> 0x3 (branch)
+CHECK-NEXT: 0x6 -> 0x6 hash: 0x32cdb7e92d280006
+CHECK:      1 secondary entry points:
+CHECK-NEXT: 0x6
 
-CHECK-BAT-DUMP:      Function Address: 0xc09900, hash: 0xcfce38fb253cf652
-CHECK-BAT-DUMP:      3 secondary entry points:
-CHECK-BAT-DUMP-NEXT: 0x7
-CHECK-BAT-DUMP-NEXT: 0x40
-CHECK-BAT-DUMP-NEXT: 0xcd
+CHECK:      Function Address: 0x[[#memcpy]], hash: 0xcfce38fb253cf652
+CHECK:      3 secondary entry points:
+CHECK-NEXT: 0x7
+CHECK-NEXT: 0x40
+CHECK-NEXT: 0xcd
 
-CHECK-BAT-DUMP:      Function Address: 0xc26200
-CHECK-BAT-DUMP:      NumBlocks: 15
+CHECK:      Function Address: 0x[[#BN_BLINDING_convert_ex]]
+CHECK:      NumBlocks: 15
