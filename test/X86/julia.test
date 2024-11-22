@@ -1,0 +1,25 @@
+# Reproduces issue https://github.com/llvm/llvm-project/issues/89117
+# The issue was triggered by computed goto in PIC binary
+
+# RUN: mkdir -p %p/Output
+# RUN: test -f %p/Output/libjulia-internal.so.1.12.0.original || \
+# RUN:   unzstd %p/Inputs/libjulia-internal.so.1.12.0.original.zst \
+# RUN:   -o %p/Output/libjulia-internal.so.1.12.0.original
+
+# RUN: test -f %p/Output/libjulia-internal.so.1.12.0-prof.merged.fdata.txt || \
+# RUN:   unzstd %p/Inputs/libjulia-internal.so.1.12.0-prof.merged.fdata.txt.zst \
+# RUN:   -o %p/Output/libjulia-internal.so.1.12.0-prof.merged.fdata.txt
+
+# Process without a profile to trigger an issue
+# RUN: llvm-bolt %p/Output/libjulia-internal.so.1.12.0.original \
+# RUN:   -o %t.bolt --use-old-text -no-huge-pages -funcs=apply_cl/1 \
+# RUN:   2>&1 | FileCheck %s
+
+# Optimize in lite mode using pre-collected fdata profile
+
+# RUN: llvm-bolt %p/Output/libjulia-internal.so.1.12.0.original \
+# RUN:   -o %t.bolt --use-old-text -no-huge-pages \
+# RUN:   -data %p/Output/libjulia-internal.so.1.12.0-prof.merged.fdata.txt \
+# RUN:   2>&1 | FileCheck %s
+
+# CHECK: BOLT-INFO
