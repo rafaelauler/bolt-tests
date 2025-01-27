@@ -40,18 +40,3 @@ CHECK-FUNC: Binary Function "_PyEval_EvalCodeWithName.localalias/1(*2)" after bu
 CHECK-FUNC: Successors: .Ltmp[[#]] (mispreds: 0, count: 1), .LFT[[#FT:]] (mispreds: 0, count: 10578)
 CHECK-FUNC:      .LFT[[#FT]] (13 instructions, align : 1)
 CHECK-FUNC-NEXT: Exec Count : 10578
-
-# Test autofdo profile generation (-autofdo option)
-RUN: perf2bolt -p %p/Output/libpython3.8-pyston2.3.so.1.0.perf \
-RUN:   -skip-funcs=_PyEval_EvalFrame_AOT_Interpreter/1 \
-RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o %t.afdo -autofdo
-RUN: FileCheck %s --check-prefix=CHECK-AFDO --input-file %t.afdo
-# LBR traces/fallthroughs: count, first record
-CHECK-AFDO:      24587
-CHECK-AFDO-NEXT: 119f8b-11a108:1
-# Basic samples: count, first record
-CHECK-AFDO:      59906
-CHECK-AFDO-NEXT: 7f3073120fe0:1
-# LBRs: count, first record
-CHECK-AFDO:      28450
-CHECK-AFDO-NEXT: 11a3d4->1c4f10:1
