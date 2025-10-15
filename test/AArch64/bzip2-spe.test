@@ -1,0 +1,41 @@
+# Check that BOLT can process bzip with Arm SPE profile and the resulting binary
+# works correctly.
+# This example uses a pre-generated SPE profile in textual format which
+# was created by Linux Perf script command.
+#
+# Why does this example rely on a textual format SPE profile?
+# - To collect an Arm Spe profile by Linux Perf,
+#   it needs to have an arm developer device which has Spe support.
+# - To decode SPE data, it also needs to have the proper version of Linux Perf.
+#   The minimum required version of Linux Perf is v6.15.
+#
+# The textual format profile was created by the following steps:
+# 1)
+#  - Gather SPE profile by using Perf
+#     $ perf record -e 'arm_spe_0/branch_filter=1/u' -- ./bzip2 bzip2.copy
+# 2)
+#  - Generate a textual format profile by using Linux Perf script command:
+#     $ perf script --show-mmap-events -F pid,brstack --itrace=bl  -i perf.data
+REQUIRES: native,system-linux,target=aarch64{{.*}}
+
+# Convert the profile
+RUN: perf2bolt %p/Inputs/bzip2 -p %p/Inputs/perf.text -o %t.fdata -perfscript --spe --ignore-build-id \
+RUN:   |& FileCheck %s -check-prefix=CHECK-P2B
+
+# Optimize using that profile
+# Check that llvm-bolt processes bzip2 binary for aarch64 in these conditions:
+#   - block reordering
+#   - function splitting
+#   - no relocs
+RUN: llvm-bolt %p/Inputs/bzip2 -o %t  -dyno-stats \
+RUN:   -data %t.fdata -reorder-blocks=cache -split-functions \
+RUN:   |& FileCheck %s -check-prefix=CHECK-BOLT
+
+# Check the resulting binary
+RUN: %t %p/Inputs/bzip2.fdata
+
+CHECK-P2B: PERF2BOLT: parsing a hybrid perf-script events...
+CHECK-P2B: PERF2BOLT: parsing perf-script mmap events output
+CHECK-P2B: PERF2BOLT: parse SPE branch events in LBR-format...
+
+CHECK-BOLT-NOT: BOLT-INFO: 0 out of {{.*}} functions in the binary (0.0%) have non-empty execution profile
