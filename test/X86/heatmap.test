@@ -11,7 +11,7 @@ RUN:   -o %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt
 RUN: llvm-bolt-heatmap -p %p/Output/libpython3.8-pyston2.3.so.1.0.perf \
 RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o %t.hm \
 RUN:   | FileCheck %s --check-prefix=CHECK-HEATMAP
-CHECK-HEATMAP: 4808721 LBR
+CHECK-HEATMAP: 4808721 brstack
 CHECK-HEATMAP: invalid traces: 32195
 RUN: FileCheck %s --input-file=%t.hm-section-hotness.csv \
 RUN:   --check-prefix=CHECK-SEC-HOT
