@@ -23,7 +23,7 @@ RUN:   |& FileCheck %s -check-prefix=CHECK-BOLT
 # Check the resulting binary
 RUN: %t %p/Inputs/bzip2.fdata
 
-CHECK-P2B:      PERF2BOLT: processing basic events (without LBR)...
+CHECK-P2B:      PERF2BOLT: processing basic events (without brstack)...
 CHECK-BOLT:     BOLT-INFO: pre-processing profile using branch profile reader
-CHECK-BOLT:     BOLT-INFO: operating with basic samples profiling data (no LBR).
+CHECK-BOLT:     BOLT-INFO: operating with basic samples profiling data (no brstack).
 CHECK-BOLT-NOT: BOLT-INFO: 0 out of {{.*}} functions in the binary (0.0%) have non-empty execution profile

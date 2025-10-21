@@ -7,7 +7,7 @@ RUN: test -f %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt || \
 RUN:   unzstd %p/Inputs/libpython3.8-pyston2.3.so.1.0.prebolt.zst \
 RUN:   -o %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt
 
-# Heatmap in LBR mode
+# Heatmap in brstack mode
 RUN: llvm-bolt-heatmap -p %p/Output/libpython3.8-pyston2.3.so.1.0.perf \
 RUN:   %p/Output/libpython3.8-pyston2.3.so.1.0.prebolt -o %t.hm \
 RUN:   | FileCheck %s --check-prefix=CHECK-HEATMAP
