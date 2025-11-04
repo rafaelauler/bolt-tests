@@ -36,6 +36,6 @@ RUN: %t %p/Inputs/bzip2.fdata
 
 CHECK-P2B: PERF2BOLT: parsing a hybrid perf-script events...
 CHECK-P2B: PERF2BOLT: parsing perf-script mmap events output
-CHECK-P2B: PERF2BOLT: parse SPE branch events in LBR-format...
+CHECK-P2B: PERF2BOLT: parse SPE branch events in brstack-format
 
 CHECK-BOLT-NOT: BOLT-INFO: 0 out of {{.*}} functions in the binary (0.0%) have non-empty execution profile
