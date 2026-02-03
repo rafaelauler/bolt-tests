@@ -27,6 +27,7 @@ RUN:    -icp-calls-total-percent-threshold=0 \
 RUN:    -icp-top-callsites=0 \
 RUN:    -eliminate-unreachable -peepholes=all \
 RUN:    -use-gnu-stack -dyno-stats -icp-jump-tables-targets \
+RUN:    --simplify-rodata-loads \
 RUN:    |& FileCheck %s
 RUN: %t %p/Inputs/bf.cpp -O2 -std=c++11 -c -o %t.out
 RUN: cmp %p/Inputs/bf.o %t.out
@@ -48,6 +49,8 @@ CHECK-NEXT: BOLT-INFO: ICP percentage of indirect branches that are optimized = 
 CHECK-NEXT: BOLT-INFO: ICP percentage of jump table callsites that are optimized = 5.3%
 CHECK-NEXT: BOLT-INFO: ICP number of jump table callsites that can use hot indices = 0
 CHECK-NEXT: BOLT-INFO: ICP percentage of jump table callsites that use hot indices = 0.0%
+CHECK-NEXT: BOLT-INFO: simplified 515 out of 962 loads from statically computed addresses
+CHECK-NEXT: BOLT-INFO: simplified 331 out of 580 dynamic loads
 
 CHECK:     3915616 : executed forward branches (-2.9%)
 CHECK:      269456 : taken forward branches (-64.6%)
@@ -58,7 +61,7 @@ CHECK:     1122267 : all function calls (=)
 CHECK:       89304 : indirect calls (-34.2%)
 CHECK:       87667 : PLT calls (=)
 CHECK:    39982400 : executed instructions (+0.0%)
-CHECK:    10058972 : executed load instructions (+0.0%)
+CHECK:    10058641 : executed load instructions (+0.0%)
 CHECK:     6828226 : executed store instructions (=)
 CHECK:       31842 : taken jump table branches (-11.2%)
 CHECK:           0 : taken unknown indirect branches (=)
