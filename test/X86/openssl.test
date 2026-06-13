@@ -16,7 +16,7 @@ RUN:   -reorder-blocks=ext-tsp -peepholes=all -dyno-stats -enable-bat \
 RUN:   -split-functions -split-all-cold -split-eh -icf \
 RUN:   -reorder-functions=cdsort -use-gnu-stack -jump-tables=move -frame-opt=hot \
 RUN:   -print-cfg -print-only=bn_mul4x_mont.*,__memcpy_evex_unaligned_erms.*,BN_BLINDING_convert_ex \
-RUN:   |& FileCheck %s -check-prefix=CHECK-BOLT-BAT
+RUN:   2>&1 | FileCheck %s -check-prefix=CHECK-BOLT-BAT
 
 # Check functions with multiple entries
 CHECK-BOLT-BAT: Binary Function "bn_mul4x_mont/1(*2)" after building cfg {

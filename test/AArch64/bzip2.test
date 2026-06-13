@@ -2,7 +2,7 @@
 #   - no block reordering (just read the input and output it correctly)
 #   - no relocs
 
-RUN: llvm-bolt %p/Inputs/bzip2 -o %t |& FileCheck %s
+RUN: llvm-bolt %p/Inputs/bzip2 -o %t 2>&1 | FileCheck %s
 
 CHECK: BOLT-INFO: Target architecture: aarch64
 CHECK: BOLT: 65 out of 102 functions were overwritten.

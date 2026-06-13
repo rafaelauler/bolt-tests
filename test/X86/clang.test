@@ -27,7 +27,7 @@ RUN:    -icp-calls-total-percent-threshold=0 \
 RUN:    -icp-top-callsites=0 \
 RUN:    -eliminate-unreachable -peepholes=all \
 RUN:    -use-gnu-stack -dyno-stats -icp-jump-tables-targets \
-RUN:    |& FileCheck %s
+RUN:    2>&1 | FileCheck %s
 RUN: %t %p/Inputs/bf.cpp -O2 -std=c++11 -c -o %t.out
 RUN: cmp %p/Inputs/bf.o %t.out
 
