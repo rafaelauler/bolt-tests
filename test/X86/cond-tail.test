@@ -1,10 +1,11 @@
 # Tests the optimization of functions that just do a tail call in the beginning.
 
-RUN: (llvm-bolt %p/Inputs/cond_tail_taken -simplify-conditional-tail-calls \
+RUN: llvm-bolt %p/Inputs/cond_tail_taken -simplify-conditional-tail-calls \
 RUN:  -sctc-mode=heuristic -peepholes=all -data %p/Inputs/cond_tail_taken.fdata \
-RUN:  -lite=0 -o %t 2>&1 && llvm-objdump -d %t --print-imm-hex) | FileCheck %s
+RUN:  -lite=0 -o %t 2>&1 | FileCheck %s --check-prefix=CHECK-BOLT
+RUN: llvm-objdump -d %t --print-imm-hex | FileCheck %s
 
-CHECK: BOLT-INFO: SCTC: patched 3 tail calls (3 forward) tail calls (1 backward) from a total of 4 while removing 0 double jumps and removing 2 basic blocks totalling 10 bytes of code.
+CHECK-BOLT: BOLT-INFO: SCTC: patched 3 tail calls (3 forward) tail calls (1 backward) from a total of 4 while removing 0 double jumps and removing 2 basic blocks totalling 10 bytes of code.
 
 CHECK: <bar>:
 CHECK-NEXT:  cmpl   %esi, %edi
@@ -17,11 +18,12 @@ CHECK-NEXT:  cmpl   %esi, %edi
 CHECK-NEXT:  jge    {{.*}} <goo>
 CHECK-NEXT:  jmp    {{.*}} <foo>
 
-RUN: (llvm-bolt %p/Inputs/cond_tail_not_taken -simplify-conditional-tail-calls \
+RUN: llvm-bolt %p/Inputs/cond_tail_not_taken -simplify-conditional-tail-calls \
 RUN:   -sctc-mode=heuristic -peepholes=all -data %p/Inputs/cond_tail_not_taken.fdata \
-RUN:   -lite=0 -o %t 2>&1 && llvm-objdump -d %t --print-imm-hex) | FileCheck %s --check-prefix=CHECK2
+RUN:   -lite=0 -o %t 2>&1 | FileCheck %s --check-prefix=CHECK-BOLT2
+RUN: llvm-objdump -d %t --print-imm-hex | FileCheck %s --check-prefix=CHECK2
 
-CHECK2: BOLT-INFO: SCTC: patched 4 tail calls (3 forward) tail calls (1 backward) from a total of 4 while removing 0 double jumps and removing 3 basic blocks totalling 15 bytes of code.
+CHECK-BOLT2: BOLT-INFO: SCTC: patched 4 tail calls (3 forward) tail calls (1 backward) from a total of 4 while removing 0 double jumps and removing 3 basic blocks totalling 15 bytes of code.
 
 CHECK2: <bar>:
 CHECK2-NEXT:  cmpl   %esi, %edi
