@@ -38,7 +38,7 @@ CHECK:      BOLT-INFO: profile for 2 objects was ignored
 
 CHECK:      BOLT-INFO: ICP total indirect callsites with profile = 1304
 CHECK-NEXT: BOLT-INFO: ICP total jump table callsites = 1237
-CHECK-NEXT: BOLT-INFO: ICP total number of calls = 1034600
+CHECK-NEXT: BOLT-INFO: ICP total number of calls = 1035721
 CHECK-NEXT: BOLT-INFO: ICP percentage of calls that are indirect = 11.6%
 CHECK-NEXT: BOLT-INFO: ICP percentage of indirect calls that can be optimized = 95.8%
 CHECK-NEXT: BOLT-INFO: ICP percentage of indirect callsites that are optimized = 100.0%
@@ -49,26 +49,26 @@ CHECK-NEXT: BOLT-INFO: ICP percentage of jump table callsites that are optimized
 CHECK-NEXT: BOLT-INFO: ICP number of jump table callsites that can use hot indices = 0
 CHECK-NEXT: BOLT-INFO: ICP percentage of jump table callsites that use hot indices = 0.0%
 
-CHECK:     3915616 : executed forward branches (-2.9%)
+CHECK:     3917455 : executed forward branches (-2.9%)
 CHECK:      269456 : taken forward branches (-64.6%)
-CHECK:      383171 : executed backward branches (+81.4%)
+CHECK:      383178 : executed backward branches (+81.4%)
 CHECK:      178163 : taken backward branches (+50.3%)
-CHECK:      224905 : executed unconditional branches (-28.8%)
-CHECK:     1122267 : all function calls (=)
-CHECK:       89304 : indirect calls (-34.2%)
+CHECK:      224906 : executed unconditional branches (-28.8%)
+CHECK:     1123388 : all function calls (=)
+CHECK:       89306 : indirect calls (-34.7%)
 CHECK:       87667 : PLT calls (=)
-CHECK:    39982400 : executed instructions (+0.0%)
-CHECK:    10058972 : executed load instructions (+0.0%)
-CHECK:     6828226 : executed store instructions (=)
+CHECK:    39993990 : executed instructions (+0.0%)
+CHECK:    10062836 : executed load instructions (+0.0%)
+CHECK:     6829285 : executed store instructions (=)
 CHECK:       31842 : taken jump table branches (-11.2%)
 CHECK:           0 : taken unknown indirect branches (=)
-CHECK:     4523692 : total branches (-0.8%)
-CHECK:      672524 : taken branches (-43.8%)
-CHECK:     3851168 : non-taken conditional branches (+14.5%)
+CHECK:     4525539 : total branches (-0.8%)
+CHECK:      672525 : taken branches (-43.8%)
+CHECK:     3853014 : non-taken conditional branches (+14.5%)
 CHECK:      447619 : taken conditional branches (-49.2%)
-CHECK:     4298787 : all conditional branches (+1.3%)
+CHECK:     4300633 : all conditional branches (+1.3%)
 
-CHECK:      BOLT-INFO: SCTC: patched 966 tail calls (952 forward) tail calls (14 backward) from a total of 966 while removing 20 double jumps and removing 886 basic blocks totalling 4430 bytes of code. CTCs total execution count is 65626 and the number of times CTCs are taken is 29810
+CHECK:      BOLT-INFO: SCTC: patched 966 tail calls (952 forward) tail calls (14 backward) from a total of 966 while removing 20 double jumps and removing 886 basic blocks totalling 4430 bytes of code. CTCs total execution count is 65729 and the number of times CTCs are taken is 29913
 CHECK:      BOLT-INFO: Peephole: 159 double jumps patched.
 CHECK-NEXT: BOLT-INFO: Peephole: 611 tail call traps inserted.
 CHECK-NEXT: BOLT-INFO: Peephole: 11 useless conditional branches removed.
